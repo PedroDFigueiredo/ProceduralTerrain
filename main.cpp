@@ -16,7 +16,7 @@ void printT(Terrain *e);
 
 int main(int argc, char** argv){
 	cout<<argv[2]<<"::::::::::::::::\n";
-	GluTerrain *gt = new GluTerrain(10, 1122, 683, atoi(argv[2]));
+	GluTerrain *gt = new GluTerrain(9, 1122, 683, atoi(argv[2]));
 	gt->init(argc, argv);
 
 }
