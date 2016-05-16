@@ -105,6 +105,13 @@ void display(void){
 			glColor3f (1.0, 1.0, 1.0);
 			float zvert = ter->get(x,y)/2;
 			if(zvert > 0){
+				glVertex3f(spaced(x), zvert-5, spaced(y));
+
+				glVertex3f(spaced(x), zvert, spaced(y));
+			}
+
+			/*float zvert = ter->get(x,y)/2;
+			if(zvert > 0){
 				glVertex3f(spaced(x), zvert, spaced(y));
 			}
 			
@@ -139,7 +146,7 @@ void display(void){
 			if(zvert > 0){
 				glVertex3f(spaced(x), zvert, spaced(y));
 			}
-			
+			*/
 			glEnd();
 
 		}
