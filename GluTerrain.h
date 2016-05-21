@@ -5,7 +5,7 @@
 class GluTerrain{
 	public:
 	Terrain *terrain;
-	int windowX, windowY;
+	int windowX, windowY, displayMode;
 
 	GluTerrain();
 	GluTerrain(int details, int width, int height, float roughness);

@@ -12,24 +12,18 @@
 #include "GluTerrain.h"
 #include <GL/glut.h>
 
-void printT(Terrain *e);
-
 int main(int argc, char** argv){
-	cout<<argv[2]<<"::::::::::::::::\n";
-	GluTerrain *gt = new GluTerrain(9, 1122, 683, atoi(argv[2]));
+	float roghness =1.5;
+	int displayMode = 0;
+
+	if(argv[2])
+		roghness = atoi(argv[2]);
+
+	if(argv[3])
+		displayMode = (int) atoi(argv[3]);
+	
+	GluTerrain *gt = new GluTerrain(10, 1122, 683, roghness);
+	gt->displayMode = displayMode;
 	gt->init(argc, argv);
-
-}
-
-void printT(Terrain *e){
-	cout <<"size: "<<e->size<<":::max: "<<e->max<<"\n";
-	int mapLenght  = e->mapLenght;
-	for (int i = 0; i < mapLenght; ++i)
-	{
-		if(e->map[i] <= 0.0)
-			cout <<"#"<<i<<" "<<e->map[i]<< "#";
-	}
-
-	cout <<"\n";
 
 }

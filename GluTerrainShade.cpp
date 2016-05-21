@@ -6,12 +6,16 @@ void specialKeysPress(int key, int x, int y);
 void display(void);
 void reshape(int w, int h);
 int spaced(int e);
+void displaySmallVectors(int line, int col, int size);
+void displaySquares(int line, int col);
+void displayPolygons(int line, int col);
 
 Terrain * ter;
-int AUX=10;
+int displayM=0;
 float testsize = 0.0, shoulder = 0.0f, elbow = 0.0f;
 float  eyeX = 0.0, eyeY = 0.0, eyeZ=0.0, 
       centerX = 0.0, centerY = 0.0, centerZ=0.0;
+
 
 GluTerrain::GluTerrain(int details, int width, int height, float roughness){
 	terrain = new Terrain(details, width, height);
@@ -26,6 +30,8 @@ void GluTerrain::init (int argc, char **argv){
 	
 	eyeX = eyeZ = eyeY = atoi(argv[1]);
 
+	displayM = displayMode;
+
 	glutInitDisplayMode (GLUT_DOUBLE|GLUT_DEPTH|GLUT_RGB);	
 	glutInitWindowSize (terrain->windowW, terrain->windowH);
 	glutInitWindowPosition (250, 0);
@@ -39,7 +45,10 @@ void GluTerrain::init (int argc, char **argv){
 	// inicializar sistema de viz.
 	glShadeModel (GL_SMOOTH);
 
-	glEnable(GL_LIGHT0);                   // habilita luX 0
+	glEnable(GL_LIGHTING);
+
+
+	glEnable(GL_LIGHT0);
 	glEnable(GL_COLOR_MATERIAL);           // Utiliza cor do objeto como material
 	glColorMaterial(GL_FRONT, GL_DIFFUSE);
 
@@ -54,7 +63,7 @@ void GluTerrain::init (int argc, char **argv){
 
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity ();
-	gluPerspective(ter->windowW, ter->windowW/ter->windowH, 0.5, 5000.0);
+	gluPerspective(ter->windowW, ter->windowW/ter->windowH, 0.1, 15000.0);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity ();
@@ -81,7 +90,6 @@ void display(void){
 
    
 	//AUX = ter->size;
-	glDisable(GL_LIGHTING);
    glBegin(GL_LINES);
    //RED AXIS x
 		glColor3f(1.0f, 0.0f, 0.0f);
@@ -95,65 +103,13 @@ void display(void){
 		glColor3f(0.0f, 0.0f, 1.0f);
 		glVertex3f(0.0f, 0.0f, 0.0f);
 		glVertex3f(0.0f, 0.0f, ter->windowH);
-   glEnd();
-	glEnable(GL_LIGHTING);
+	glEnd();
 
-	for (float y = 0; y < ter->size; y++) {
-		for (float x = 0; x < ter->size; x++) {
-			glBegin(GL_LINES);	
-
-			glColor3f (1.0, 1.0, 1.0);
-			float zvert = ter->get(x,y)/2;
-			if(zvert > 0){
-				glVertex3f(spaced(x), zvert-5, spaced(y));
-
-				glVertex3f(spaced(x), zvert, spaced(y));
-			}
-
-			/*float zvert = ter->get(x,y)/2;
-			if(zvert > 0){
-				glVertex3f(spaced(x), zvert, spaced(y));
-			}
-			
-			zvert = ter->get(x+1,y)/2;
-			if(zvert > 0){
-				glVertex3f(spaced(x+1), zvert, spaced(y));
-			}
-
-			if(zvert > 0){
-				glVertex3f(spaced(x+1), zvert, spaced(y));
-			}
-			
-			zvert = ter->get(x+1,y+1)/2;
-			if(zvert > 0){
-				glVertex3f(spaced(x+1), zvert, spaced(y+1));
-			}
-
-			if(zvert > 0){
-				glVertex3f(spaced(x+1), zvert, spaced(y+1));
-			}
-						
-			zvert = ter->get(x,y+1)/2;
-			if(zvert > 0){
-				glVertex3f(spaced(x), zvert, spaced(y+1));
-			}
-			
-			if(zvert > 0){
-				glVertex3f(spaced(x), zvert, spaced(y+1));
-			}
-			
-			zvert = ter->get(x,y)/2;
-			if(zvert > 0){
-				glVertex3f(spaced(x), zvert, spaced(y));
-			}
-			*/
-			glEnd();
-
-		}
+	switch(displayM){
+		case 0: displaySmallVectors(ter->size, ter->size, 5); break;
+		case 1: displayPolygons(ter->size, ter->size); break;
+		case 2: displaySquares(ter->size, ter->size); break;
 	}
-//	cout<<":::::::::::::::::::::::::::::::::::\n";
-
-
    // N�o esperar!
    glutSwapBuffers();
    reshape(ter->windowW, ter->windowH);
@@ -164,24 +120,25 @@ int spaced(int e){
 	return e*3;
 }
 
+int velocity = 30;
 void specialKeysPress(int key, int x, int y){
 	//cout<< sqrt(pow(key,2)) << "\n";
 	switch (key){
       case 100:
-         centerX -= 10;
+         centerX -= velocity;
       break;
       case 102:
-         centerX += 10;
+         centerX += velocity;
       break;
       case 101:
-         centerY += 10;
+         centerY += velocity;
       break;
       case 103:
-         centerY -= 10;
+         centerY -= velocity;
       break;
    }
 
-	cout<<"cX:"<<centerX<<" cY:"<<centerY<<" cZ:"<<centerZ<<"\n";
+//	cout<<"cX:"<<centerX<<" cY:"<<centerY<<" cZ:"<<centerZ<<"\n";
 	glutPostRedisplay();
 }
 
@@ -190,31 +147,143 @@ void keyboard(unsigned char key, int x, int y)
    	switch (key){
 	
 	   case 'w':
-	      eyeY +=10;
+	      eyeY +=velocity;
 	   break;
 	   case 's':
-	      eyeY -=10;
+	      eyeY -=velocity;
 	   break;
 	   case 'a':
-	      eyeX -=10;
+	      eyeX -=velocity;
 	   break;
 	   case 'd':
-	      eyeX +=10;
-	   break;
-	   case 'z':
-	      eyeZ -=10;
+	      eyeX +=velocity;
 	   break;
 	   case 'c':
-	      eyeZ +=10;
+	      eyeZ -=velocity;
 	   break;
-	   case 'n':
-	      centerZ -=10;
+	   case 'z':
+	      eyeZ +=velocity;
 	   break;
 	   case 'm':
-	      centerZ +=10;
+	      centerZ -=velocity;
+	   break;
+	   case 'n':
+	      centerZ +=velocity;
 	   break;
 	}
-	cout<<"x:"<<eyeX<<" y:"<<eyeY<<" z:"<<eyeZ<<"\n";
+//	cout<<"x:"<<eyeX<<" y:"<<eyeY<<" z:"<<eyeZ<<"\n";
 	glutPostRedisplay();
 	
+}
+
+void displaySmallVectors(int line, int col, int size){
+	
+	for (float y = 0; y < col; y++) {
+		for (float x = 0; x < line; x++) {
+			glBegin(GL_LINES);	
+
+			glColor3f (1.0, 1.0, 1.0);
+			float yvert = ter->get(x,y)/2;
+			if(yvert > 0){
+				glVertex3f(spaced(x), yvert-size, spaced(y));
+
+				glVertex3f(spaced(x), yvert, spaced(y));
+			}
+			glEnd();
+
+		}
+	}	
+}
+
+void displaySquares(int line, int col){
+	for (float y = 0; y < col; y++) {
+		for (float x = 0; x < line; x++) {
+			glBegin(GL_LINES);	
+
+			glColor3f (1.0, 1.0, 1.0);
+
+			float yvert = ter->get(x,y)/2;
+			if(yvert > 0){
+				glVertex3f(spaced(x), yvert, spaced(y));
+			}
+			
+			yvert = ter->get(x+1,y)/2;
+			if(yvert > 0){
+				glVertex3f(spaced(x+1), yvert, spaced(y));
+			}
+
+			if(yvert > 0){
+				glVertex3f(spaced(x+1), yvert, spaced(y));
+			}
+			
+			yvert = ter->get(x+1,y+1)/2;
+			if(yvert > 0){
+				glVertex3f(spaced(x+1), yvert, spaced(y+1));
+			}
+
+			if(yvert > 0){
+				glVertex3f(spaced(x+1), yvert, spaced(y+1));
+			}
+						
+			yvert = ter->get(x,y+1)/2;
+			if(yvert > 0){
+				glVertex3f(spaced(x), yvert, spaced(y+1));
+			}
+			
+			if(yvert > 0){
+				glVertex3f(spaced(x), yvert, spaced(y+1));
+			}
+			
+			yvert = ter->get(x,y)/2;
+			if(yvert > 0){
+				glVertex3f(spaced(x), yvert, spaced(y));
+			}
+			
+			glEnd();
+
+		}
+	}	
+}
+void checkLight(int x, int z, float yvert){
+	if(ter->get(x, z+1)>0){
+		if(yvert < ter->get(x, z+1))
+			glColor3f (0.0, 0.0, 0.0);
+		else
+			glColor3f (1.0, 1.0, 1.0);
+	}
+}
+
+void displayPolygons(int line, int col){
+	for (float y = 0; y < col; y++) {
+		for (float x = 0; x < line; x++) {
+			glBegin(GL_POLYGON);	
+
+
+			float yvert = ter->get(x,y)/2;
+			if(yvert > 0){
+				glVertex3f(spaced(x), yvert, spaced(y));
+				checkLight(x, y, yvert);
+			}
+
+			yvert = ter->get(x+1,y)/2;
+			if(yvert > 0){
+				glVertex3f(spaced(x+1), yvert, spaced(y));
+				checkLight(x+1, y, yvert);
+			}
+
+			yvert = ter->get(x+1,y+1)/2;
+			if(yvert > 0){
+				glVertex3f(spaced(x+1), yvert, spaced(y+1));
+				checkLight(x+1, y+1, yvert);
+			}
+					
+			yvert = ter->get(x,y+1)/2;
+			if(yvert > 0){
+				glVertex3f(spaced(x), yvert, spaced(y+1));
+				checkLight(x, y+1, yvert);
+			}			
+			glEnd();
+
+		}
+	}	
 }
