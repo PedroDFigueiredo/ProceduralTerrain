@@ -11,8 +11,8 @@ void displaySquares(int line, int col);
 void displayPolygons(int line, int col);
 
 Terrain * ter;
-int displayM=0;
-float testsize = 0.0, shoulder = 0.0f, elbow = 0.0f;
+int displayM=0, angle=225, initPosition=0;
+float testsize = 0.0, shoulder = 0.0f, elbow = 0.0f, xvar=290, zvar=290;
 float  eyeX = 0.0, eyeY = 0.0, eyeZ=0.0, 
       centerX = 0.0, centerY = 0.0, centerZ=0.0;
 
@@ -28,7 +28,10 @@ void GluTerrain::init (int argc, char **argv){
 	glutInit(&argc, argv);
 	cout<<"testsize "<<atoi(argv[1])<<"\n";
 	
-	eyeX = eyeZ = eyeY = atoi(argv[1]);
+	initPosition = eyeX = eyeZ = eyeY = atoi(argv[1]);
+  	centerZ = eyeZ + sin(angle*M_PI/180)*initPosition;
+  	centerX = eyeX + cos(angle*M_PI/180)*initPosition;     
+  	cout<<"centerY"<<( sin(45*M_PI/180)	)<<"\n";
 
 	displayM = displayMode;
 
@@ -89,7 +92,6 @@ void display(void){
 	glClear (GL_COLOR_BUFFER_BIT|| GL_DEPTH_BUFFER_BIT);
 
    
-	//AUX = ter->size;
    glBegin(GL_LINES);
    //RED AXIS x
 		glColor3f(1.0f, 0.0f, 0.0f);
@@ -105,6 +107,12 @@ void display(void){
 		glVertex3f(0.0f, 0.0f, ter->windowH);
 	glEnd();
 
+	glBegin(GL_LINES);
+   //RED AXIS x
+		glColor3f(1.0f, 0.0f, 0.0f);
+		glVertex3f(0, 0.0f, 0);
+		glVertex3f(centerX, centerY, centerZ);
+	glEnd();	
 	switch(displayM){
 		case 0: displaySmallVectors(ter->size, ter->size, 5); break;
 		case 1: displayPolygons(ter->size, ter->size); break;
@@ -122,23 +130,33 @@ int spaced(int e){
 
 int velocity = 30;
 void specialKeysPress(int key, int x, int y){
-	//cout<< sqrt(pow(key,2)) << "\n";
+    cout<<angle<<":"<<centerX<<"::"<<centerZ<<"\n";
 	switch (key){
-      case 100:
-         centerX -= velocity;
-      break;
-      case 102:
-         centerX += velocity;
-      break;
-      case 101:
-         centerY += velocity;
-      break;
-      case 103:
-         centerY -= velocity;
-      break;
-   }
-
-//	cout<<"cX:"<<centerX<<" cY:"<<centerY<<" cZ:"<<centerZ<<"\n";
+		case 100:
+		 //centerX -= velocity;
+		 	angle-1<0?angle = 350-angle: angle -=1;   
+/**/
+		  	centerZ = eyeZ + sin(angle*M_PI/180)*initPosition;
+		  	centerX = eyeX + cos(angle*M_PI/180)*initPosition;     
+		break;
+		case 102:
+		 // centerX = eyeX + velocity;
+		  	angle+1>360? angle = angle -360: angle += 1;
+		 	centerZ = eyeZ + sin(angle*M_PI/180)*initPosition;
+		  	centerX = eyeX + cos(angle*M_PI/180)*initPosition;     
+		break;
+		case 101:
+		 centerY += velocity;
+		break;
+		case 103:
+		 centerY -= velocity;
+		break;
+	}
+/*
+   x' = x cos θ − y sin θ
+    y' = x sin θ + y cos θ
+*/
+	cout<<"angle"<<angle<<"   cX:"<<centerX<<" cY:"<<centerY<<" cZ:"<<centerZ<<"\n";
 	glutPostRedisplay();
 }
 
@@ -171,6 +189,9 @@ void keyboard(unsigned char key, int x, int y)
 	      centerZ +=velocity;
 	   break;
 	}
+  	centerZ = eyeZ + sin(angle*M_PI/180)*initPosition;
+  	centerX = eyeX + cos(angle*M_PI/180)*initPosition;     
+
 //	cout<<"x:"<<eyeX<<" y:"<<eyeY<<" z:"<<eyeZ<<"\n";
 	glutPostRedisplay();
 	
