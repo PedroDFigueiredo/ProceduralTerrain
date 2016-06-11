@@ -1,11 +1,5 @@
 #include "Terrain.h"
 
-struct Node{
-	float x;
-	float y;
-	float z;
-};
-
 struct Style{
 	float r, g, b, a;
 };
@@ -15,12 +9,11 @@ float brightness(int x, int y, float get, float max);
 float average(float values[4]);
 
 Terrain::Terrain(){};
-int WIDTH, HEIGHT;
 
 Terrain::Terrain(int details, int width, int height){
 	cout<<"*New Terrain\n";
-	windowW = WIDTH = width;
-	windowH = HEIGHT = height;
+	windowW = width;
+	windowH = height;
 
 	size = pow(2, details) +1;
 	mapLenght = size*size;
@@ -55,10 +48,12 @@ void Terrain::generate(float rough){
 void Terrain::divide(int sizeParam){
 	//cout<<"***Dividing map "<< sizeParam <<"\n";
 
+	if (sizeParam == 1) return;
+
 	float scale = roughness * sizeParam;
-	int x, y, half = sizeParam/ 2;
-        srand (time(NULL));
-	if (half < 1) return;
+	int x, y, half = sizeParam / 2;
+    srand (time(NULL));
+
 	for (y = half; y < max; y += sizeParam) {
 		for (x = half; x < max; x += sizeParam) {
 			float aux = ((rand()%10000)/10000.0);
@@ -138,7 +133,7 @@ void Terrain::draw(int x, int y){
 
 }
 
-float brightness(int x, int y, float slope, float max){
+float Terrain::brightness(int x, int y, float slope, float max){
 	if (y == max || x == max) {
 		return 0;
 	}else{
@@ -147,12 +142,12 @@ float brightness(int x, int y, float slope, float max){
 	}
 }
 
-void project(Node *node, float flatX, float flatY, float flatZ, int sizeParam) {
+void Terrain::project(Node *node, float flatX, float flatY, float flatZ, int sizeParam) {
 	float isomX = 0.5 * sizeParam + flatX - flatY;
 	float isomY = 0.5 * flatX + flatY;
 
-	float xzero = WIDTH * 0.5;
-	float yzero = HEIGHT * 0.2;
+	float xzero = windowW * 0.5;
+	float yzero = windowH * 0.2;
 
 	float z = sizeParam *0.5 - flatZ + isomY * 0.75;
 	float x = (isomX - sizeParam *0.5)*6;
